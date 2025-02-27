@@ -1,38 +1,44 @@
 ﻿using RestSharp;
 using System.Text.Json;
-using TamagotchiPokemon; 
+using TamagotchiPokemon; // Adicione o namespace das classes
 
 class Program {
-    static void Main(string[] args) {
+    static async Task Main(string[] args) {
         string url = "https://pokeapi.co/api/v2/pokemon?limit=9";
+
         var client = new RestClient(url);
         var request = new RestRequest("", Method.Get);
-        var response = client.Execute(request);
+        var response = await client.ExecuteAsync(request); 
 
         if (response.IsSuccessful) {
             var options = new JsonSerializerOptions {
                 PropertyNameCaseInsensitive = true
             };
-            PokemonResponse pokemonList = JsonSerializer.Deserialize<PokemonResponse>(response.Content, options);
+            PokemonListResponse pokemonList = JsonSerializer.Deserialize<PokemonListResponse>(response.Content, options);
 
             Console.WriteLine("Lista de Mascotes Virtuais (Pokémon) Disponíveis para Adoção:");
             Console.WriteLine("------------------------------------------------");
 
-            foreach (var pokemon in pokemonList.Results) {
-                Console.WriteLine($"\nNome: {pokemon.Name.ToUpper()}");
-                Console.WriteLine($"Altura: {(pokemon.Height / 10.0)} m"); 
-                Console.WriteLine($"Peso: {(pokemon.Weight / 10.0)} kg");  
-                Console.WriteLine("Habilidades:");
-                if (pokemon.Abilities != null && pokemon.Abilities.Any()) 
-                {
-                    foreach (var ability in pokemon.Abilities) {
-                        Console.WriteLine($"- {ability.Name} (Escondida: {ability.IsHidden}, Slot: {ability.Slot})");
+            var tasks = pokemonList.Results.Select(async pokemon => await FetchPokemonDetails(pokemon.Url));
+            var detailedPokemons = await Task.WhenAll(tasks);
+
+            foreach (var pokemon in detailedPokemons) {
+                if (pokemon != null) {
+                    Console.WriteLine($"\nNome: {pokemon.Name.ToUpper()}");
+                    Console.WriteLine($"Altura: {(pokemon.Height / 10.0)} m"); 
+                    Console.WriteLine($"Peso: {(pokemon.Weight / 10.0)} kg");  
+                    Console.WriteLine("Habilidades:");
+                    if (pokemon.Abilities != null && pokemon.Abilities.Any()) 
+                    {
+                        foreach (var ability in pokemon.Abilities) {
+                            Console.WriteLine($"- {ability.Name} (Escondida: {ability.IsHidden}, Slot: {ability.Slot})");
+                        }
                     }
+                    else {
+                        Console.WriteLine("- Nenhuma habilidade encontrada.");
+                    }
+                    Console.WriteLine("------------------------------------------------");
                 }
-                else {
-                    Console.WriteLine("- Nenhuma habilidade encontrada.");
-                }
-                Console.WriteLine("------------------------------------------------");
             }
         }
         else {
@@ -43,34 +49,16 @@ class Program {
         Console.ReadKey();
     }
 
-    static void BuscarDetalhesPokemon(string nome) {
-        string url = $"https://pokeapi.co/api/v2/pokemon/{nome.ToLower()}";
+    static async Task<Pokemon> FetchPokemonDetails(string url) {
         var client = new RestClient(url);
         var request = new RestRequest("", Method.Get);
-        var response = client.Execute(request);
+        var response = await client.ExecuteAsync(request);
 
         if (response.IsSuccessful) {
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            Pokemon pokemon = JsonSerializer.Deserialize<Pokemon>(response.Content, options);
-
-            Console.WriteLine($"\nDetalhes do Pokémon {pokemon.Name.ToUpper()}:");
-            Console.WriteLine($"Tipo: {GetPokemonTypes(response.Content)}"); 
-            Console.WriteLine($"Altura: {(pokemon.Height / 10.0)} m");
-            Console.WriteLine($"Peso: {(pokemon.Weight / 10.0)} kg");
-            Console.WriteLine("Habilidades:");
-            if (pokemon.Abilities != null && pokemon.Abilities.Any())
-            {
-                foreach (var ability in pokemon.Abilities) {
-                    Console.WriteLine($"- {ability.Name} (Escondida: {ability.IsHidden}, Slot: {ability.Slot})");
-                }
-            }
-            else {
-                Console.WriteLine("- Nenhuma habilidade encontrada.");
-            }
+            return JsonSerializer.Deserialize<Pokemon>(response.Content, options);
         }
-        else {
-            Console.WriteLine("Não foi possível obter detalhes do Pokémon.");
-        }
+        return null;
     }
 
     static string GetPokemonTypes(string jsonContent) {
@@ -86,5 +74,36 @@ class Program {
             return string.Join(", ", types);
         }
         return "Tipo não encontrado";
+    }
+
+    static void BuscarDetalhesPokemon(string nome) {
+        string url = $"https://pokeapi.co/api/v2/pokemon/{nome.ToLower()}";
+
+        var client = new RestClient(url);
+        var request = new RestRequest("", Method.Get);
+        var response = client.Execute(request);
+
+        if (response.IsSuccessful) {
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            Pokemon pokemon = JsonSerializer.Deserialize<Pokemon>(response.Content, options);
+
+            Console.WriteLine($"\nDetalhes do Pokémon {pokemon.Name.ToUpper()}:");
+            Console.WriteLine($"Tipo: {GetPokemonTypes(response.Content)}"); 
+            Console.WriteLine($"Altura: {(pokemon.Height / 10.0)} m");
+            Console.WriteLine($"Peso: {(pokemon.Weight / 10.0)} kg");
+            Console.WriteLine("Habilidades:");
+            if (pokemon.Abilities != null && pokemon.Abilities.Any()) 
+            {
+                foreach (var ability in pokemon.Abilities) {
+                    Console.WriteLine($"- {ability.Name} (Escondida: {ability.IsHidden}, Slot: {ability.Slot})");
+                }
+            }
+            else {
+                Console.WriteLine("- Nenhuma habilidade encontrada.");
+            }
+        }
+        else {
+            Console.WriteLine("Não foi possível obter detalhes do Pokémon.");
+        }
     }
 }
