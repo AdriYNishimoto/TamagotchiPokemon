@@ -123,7 +123,7 @@ class Program {
             if (pokemon.Abilities != null && pokemon.Abilities.Any()) 
             {
                 foreach (var ability in pokemon.Abilities) {
-                    Console.WriteLine($"- {ability.Name} (Escondida: {ability.IsHidden}, Slot: {ability.Slot})");
+                    Console.WriteLine($"- {ability.Name}");
                 }
             }
             else {
