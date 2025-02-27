@@ -10,6 +10,7 @@ namespace TamagotchiPokemon {
             _client = new RestClient();
         }
 
+        // Busca a cadeia evolutiva de um Pokémon pelo ID
         public async Task<EvolutionChain> GetEvolutionChain(int pokemonId) {
             string evolutionUrl = $"https://pokeapi.co/api/v2/evolution-chain/{pokemonId}/";
             var request = new RestRequest(evolutionUrl, Method.Get);
@@ -22,7 +23,9 @@ namespace TamagotchiPokemon {
             return null;
         }
 
+        // Obtém o próximo estágio evolutivo de um Pokémon com base no nome atual
         public async Task<Pokemon> GetNextEvolution(string currentPokemonName) {
+            // Mapeamento manual das evoluções (pode ser expandido com base na cadeia evolutiva)
             Dictionary<string, string> evolutionMap = new()
             {
                 { "bulbasaur", "ivysaur" },
@@ -51,6 +54,7 @@ namespace TamagotchiPokemon {
             return null;
         }
 
+        // Método para evoluir um Pokémon com base em critérios (ex.: nível, felicidade)
         public async Task<Pokemon> EvolvePokemon(Pokemon currentPokemon, int level = 0, int happiness = 0) {
             if (currentPokemon == null) return null;
 
@@ -73,7 +77,7 @@ namespace TamagotchiPokemon {
                 return await GetNextEvolution("wartortle");
             }
 
-            return currentPokemon; 
+            return currentPokemon; // Não evolui se critérios não atendidos
         }
     }
 }

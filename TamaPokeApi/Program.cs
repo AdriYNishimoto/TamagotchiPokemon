@@ -1,19 +1,17 @@
 ﻿using RestSharp;
 using System.Text.Json;
-using TamagotchiPokemon; 
+using TamagotchiPokemon;
 
 class Program {
     static async Task Main(string[] args) {
         string[] pokemonUrls = new[]
         {
-            "https://pokeapi.co/api/v2/pokemon/1/", 
-            "https://pokeapi.co/api/v2/pokemon/4/", 
-            "https://pokeapi.co/api/v2/pokemon/7/" 
+            "https://pokeapi.co/api/v2/pokemon/1/", // Bulbasaur
+            "https://pokeapi.co/api/v2/pokemon/4/", // Charmander
+            "https://pokeapi.co/api/v2/pokemon/7/"  // Squirtle
         };
 
         var client = new RestClient();
-
-        var evolutionSystem = new TamagotchiEvolution();
 
         Console.WriteLine("Lista de Mascotes Virtuais (Pokémon) Disponíveis para Adoção:");
         Console.WriteLine("------------------------------------------------");
@@ -24,8 +22,8 @@ class Program {
         foreach (var pokemon in detailedPokemons) {
             if (pokemon != null) {
                 Console.WriteLine($"\nNome: {pokemon.Name.ToUpper()}");
-                Console.WriteLine($"Altura: {(pokemon.Height / 10.0)} m");
-                Console.WriteLine($"Peso: {(pokemon.Weight / 10.0)} kg");  
+                Console.WriteLine($"Altura: {(pokemon.Height / 10.0)} m"); 
+                Console.WriteLine($"Peso: {(pokemon.Weight / 10.0)} kg"); 
                 Console.WriteLine("Habilidades:");
                 if (pokemon.Abilities != null && pokemon.Abilities.Any()) 
                 {
@@ -40,38 +38,9 @@ class Program {
             }
         }
 
-        Console.WriteLine("\nDemonstração futura de evolução (a ser implementada nos próximos dias):");
-        Pokemon bulbasaur = detailedPokemons.FirstOrDefault(p => p?.Name == "bulbasaur");
-        if (bulbasaur != null) {
-            Pokemon evolved = await evolutionSystem.EvolvePokemon(bulbasaur, level: 16); 
-            if (evolved != null && evolved.Name != bulbasaur.Name) {
-                Console.WriteLine($"Evolução: {bulbasaur.Name.ToUpper()} evoluiu para {evolved.Name.ToUpper()}!");
-            }
-            else {
-                Console.WriteLine($"{bulbasaur.Name.ToUpper()} não pode evoluir ainda (nível insuficiente).");
-            }
-        }Console.WriteLine("\nDemonstração futura de evolução (a ser implementada nos próximos dias):");
-
-        Pokemon charmander = detailedPokemons.FirstOrDefault(p => p?.Name == "charmander");
-        if (charmander != null) {
-            Pokemon evolved = await evolutionSystem.EvolvePokemon(charmander, level: 16); 
-            if (evolved != null && evolved.Name != charmander.Name) {
-                Console.WriteLine($"Evolução: {charmander.Name.ToUpper()} evoluiu para {evolved.Name.ToUpper()}!");
-            }
-            else {
-                Console.WriteLine($"{bulbasaur.Name.ToUpper()} não pode evoluir ainda (nível insuficiente).");
-            }
-        }Console.WriteLine("\nDemonstração futura de evolução (a ser implementada nos próximos dias):");
-        Pokemon squirtle = detailedPokemons.FirstOrDefault(p => p?.Name == "squirtle");
-        if (squirtle != null) {
-            Pokemon evolved = await evolutionSystem.EvolvePokemon(squirtle, level: 16); 
-            if (evolved != null && evolved.Name != squirtle.Name) {
-                Console.WriteLine($"Evolução: {squirtle.Name.ToUpper()} evoluiu para {evolved.Name.ToUpper()}!");
-            }
-            else {
-                Console.WriteLine($"{bulbasaur.Name.ToUpper()} não pode evoluir ainda (nível insuficiente).");
-            }
-        }
+        // Futura implementação (Dias 3-7): Para evoluir os Pokémon, podemos usar FetchEvolutionChain para obter as cadeias evolutivas
+        // Exemplo: EvolutionChain bulbasaurChain = await FetchEvolutionChain(1);
+        // Isso retornará Bulbasaur → Ivysaur → Venusaur. Podemos adicionar lógica para "evoluir" o mascote com base em interações (ex.: nível, felicidade).
 
         Console.WriteLine("\nPressione qualquer tecla para sair...");
         Console.ReadKey();
@@ -123,7 +92,7 @@ class Program {
             if (pokemon.Abilities != null && pokemon.Abilities.Any()) 
             {
                 foreach (var ability in pokemon.Abilities) {
-                    Console.WriteLine($"- {ability.Name}");
+                    Console.WriteLine($"- {ability.Name} (Escondida: {ability.IsHidden}, Slot: {ability.Slot})");
                 }
             }
             else {
