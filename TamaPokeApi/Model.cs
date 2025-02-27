@@ -2,15 +2,22 @@
 using System.Text.Json.Serialization;
 
 namespace TamagotchiPokemon {
-    public class Ability {
+    public class AbilityDetail {
         [JsonPropertyName("name")]
         public string Name { get; set; }
+    }
+
+    public class Ability {
+        [JsonPropertyName("ability")]
+        public AbilityDetail AbilityDetail { get; set; }
 
         [JsonPropertyName("is_hidden")]
         public bool IsHidden { get; set; }
 
         [JsonPropertyName("slot")]
         public int Slot { get; set; }
+
+        public string Name => AbilityDetail?.Name ?? "Nome não encontrado";
     }
 
     public class Pokemon {
@@ -18,7 +25,7 @@ namespace TamagotchiPokemon {
         public string Name { get; set; }
 
         [JsonPropertyName("height")]
-        public int Height { get; set; } 
+        public int Height { get; set; }
 
         [JsonPropertyName("weight")]
         public int Weight { get; set; } 
@@ -27,8 +34,16 @@ namespace TamagotchiPokemon {
         public List<Ability> Abilities { get; set; } = new List<Ability>(); 
     }
 
-    public class PokemonResponse {
+    public class PokemonListResponse {
         [JsonPropertyName("results")]
-        public List<Pokemon> Results { get; set; } = new List<Pokemon>(); 
+        public List<PokemonSummary> Results { get; set; } = new List<PokemonSummary>();
+    }
+
+    public class PokemonSummary {
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+
+        [JsonPropertyName("url")]
+        public string Url { get; set; }
     }
 }
