@@ -1,10 +1,9 @@
 ﻿using RestSharp;
 using System.Text.Json;
-using TamagotchiPokemon;
+using TamagotchiPokemon; 
 
 class Program {
     static void Main(string[] args) {
-        // URL da API com limite de 9 Pokémon
         string url = "https://pokeapi.co/api/v2/pokemon?limit=9";
         var client = new RestClient(url);
         var request = new RestRequest("", Method.Get);
@@ -24,8 +23,14 @@ class Program {
                 Console.WriteLine($"Altura: {(pokemon.Height / 10.0)} m"); 
                 Console.WriteLine($"Peso: {(pokemon.Weight / 10.0)} kg");  
                 Console.WriteLine("Habilidades:");
-                foreach (var ability in pokemon.Abilities) {
-                    Console.WriteLine($"- {ability.Name} (Escondida: {ability.IsHidden}, Slot: {ability.Slot})");
+                if (pokemon.Abilities != null && pokemon.Abilities.Any()) 
+                {
+                    foreach (var ability in pokemon.Abilities) {
+                        Console.WriteLine($"- {ability.Name} (Escondida: {ability.IsHidden}, Slot: {ability.Slot})");
+                    }
+                }
+                else {
+                    Console.WriteLine("- Nenhuma habilidade encontrada.");
                 }
                 Console.WriteLine("------------------------------------------------");
             }
@@ -40,13 +45,11 @@ class Program {
 
     static void BuscarDetalhesPokemon(string nome) {
         string url = $"https://pokeapi.co/api/v2/pokemon/{nome.ToLower()}";
-
         var client = new RestClient(url);
         var request = new RestRequest("", Method.Get);
         var response = client.Execute(request);
 
         if (response.IsSuccessful) {
-
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             Pokemon pokemon = JsonSerializer.Deserialize<Pokemon>(response.Content, options);
 
@@ -55,8 +58,14 @@ class Program {
             Console.WriteLine($"Altura: {(pokemon.Height / 10.0)} m");
             Console.WriteLine($"Peso: {(pokemon.Weight / 10.0)} kg");
             Console.WriteLine("Habilidades:");
-            foreach (var ability in pokemon.Abilities) {
-                Console.WriteLine($"- {ability.Name} (Escondida: {ability.IsHidden}, Slot: {ability.Slot})");
+            if (pokemon.Abilities != null && pokemon.Abilities.Any())
+            {
+                foreach (var ability in pokemon.Abilities) {
+                    Console.WriteLine($"- {ability.Name} (Escondida: {ability.IsHidden}, Slot: {ability.Slot})");
+                }
+            }
+            else {
+                Console.WriteLine("- Nenhuma habilidade encontrada.");
             }
         }
         else {
