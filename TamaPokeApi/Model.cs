@@ -25,7 +25,7 @@ namespace TamagotchiPokemon {
         public string Name { get; set; }
 
         [JsonPropertyName("height")]
-        public int Height { get; set; }
+        public int Height { get; set; } 
 
         [JsonPropertyName("weight")]
         public int Weight { get; set; } 
@@ -40,6 +40,27 @@ namespace TamagotchiPokemon {
     }
 
     public class PokemonSummary {
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+
+        [JsonPropertyName("url")]
+        public string Url { get; set; }
+    }
+
+    public class EvolutionChain {
+        [JsonPropertyName("chain")]
+        public EvolutionLink Chain { get; set; }
+    }
+
+    public class EvolutionLink {
+        [JsonPropertyName("species")]
+        public Species Species { get; set; }
+
+        [JsonPropertyName("evolves_to")]
+        public List<EvolutionLink> EvolvesTo { get; set; } = new List<EvolutionLink>();
+    }
+
+    public class Species {
         [JsonPropertyName("name")]
         public string Name { get; set; }
 

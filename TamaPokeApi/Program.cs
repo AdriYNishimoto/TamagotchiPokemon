@@ -1,48 +1,76 @@
 ﻿using RestSharp;
 using System.Text.Json;
-using TamagotchiPokemon; // Adicione o namespace das classes
+using TamagotchiPokemon; 
 
 class Program {
     static async Task Main(string[] args) {
-        string url = "https://pokeapi.co/api/v2/pokemon?limit=9";
+        string[] pokemonUrls = new[]
+        {
+            "https://pokeapi.co/api/v2/pokemon/1/", 
+            "https://pokeapi.co/api/v2/pokemon/4/", 
+            "https://pokeapi.co/api/v2/pokemon/7/" 
+        };
 
-        var client = new RestClient(url);
-        var request = new RestRequest("", Method.Get);
-        var response = await client.ExecuteAsync(request); 
+        var client = new RestClient();
 
-        if (response.IsSuccessful) {
-            var options = new JsonSerializerOptions {
-                PropertyNameCaseInsensitive = true
-            };
-            PokemonListResponse pokemonList = JsonSerializer.Deserialize<PokemonListResponse>(response.Content, options);
+        var evolutionSystem = new TamagotchiEvolution();
 
-            Console.WriteLine("Lista de Mascotes Virtuais (Pokémon) Disponíveis para Adoção:");
-            Console.WriteLine("------------------------------------------------");
+        Console.WriteLine("Lista de Mascotes Virtuais (Pokémon) Disponíveis para Adoção:");
+        Console.WriteLine("------------------------------------------------");
 
-            var tasks = pokemonList.Results.Select(async pokemon => await FetchPokemonDetails(pokemon.Url));
-            var detailedPokemons = await Task.WhenAll(tasks);
+        var tasks = pokemonUrls.Select(url => FetchPokemonDetails(url));
+        var detailedPokemons = await Task.WhenAll(tasks);
 
-            foreach (var pokemon in detailedPokemons) {
-                if (pokemon != null) {
-                    Console.WriteLine($"\nNome: {pokemon.Name.ToUpper()}");
-                    Console.WriteLine($"Altura: {(pokemon.Height / 10.0)} m"); 
-                    Console.WriteLine($"Peso: {(pokemon.Weight / 10.0)} kg");  
-                    Console.WriteLine("Habilidades:");
-                    if (pokemon.Abilities != null && pokemon.Abilities.Any()) 
-                    {
-                        foreach (var ability in pokemon.Abilities) {
-                            Console.WriteLine($"- {ability.Name} (Escondida: {ability.IsHidden}, Slot: {ability.Slot})");
-                        }
+        foreach (var pokemon in detailedPokemons) {
+            if (pokemon != null) {
+                Console.WriteLine($"\nNome: {pokemon.Name.ToUpper()}");
+                Console.WriteLine($"Altura: {(pokemon.Height / 10.0)} m");
+                Console.WriteLine($"Peso: {(pokemon.Weight / 10.0)} kg");  
+                Console.WriteLine("Habilidades:");
+                if (pokemon.Abilities != null && pokemon.Abilities.Any()) 
+                {
+                    foreach (var ability in pokemon.Abilities) {
+                        Console.WriteLine($"- {ability.Name} (Escondida: {ability.IsHidden}, Slot: {ability.Slot})");
                     }
-                    else {
-                        Console.WriteLine("- Nenhuma habilidade encontrada.");
-                    }
-                    Console.WriteLine("------------------------------------------------");
                 }
+                else {
+                    Console.WriteLine("- Nenhuma habilidade encontrada.");
+                }
+                Console.WriteLine("------------------------------------------------");
             }
         }
-        else {
-            Console.WriteLine("Erro ao buscar dados da API: " + response.ErrorMessage);
+
+        Console.WriteLine("\nDemonstração futura de evolução (a ser implementada nos próximos dias):");
+        Pokemon bulbasaur = detailedPokemons.FirstOrDefault(p => p?.Name == "bulbasaur");
+        if (bulbasaur != null) {
+            Pokemon evolved = await evolutionSystem.EvolvePokemon(bulbasaur, level: 16); 
+            if (evolved != null && evolved.Name != bulbasaur.Name) {
+                Console.WriteLine($"Evolução: {bulbasaur.Name.ToUpper()} evoluiu para {evolved.Name.ToUpper()}!");
+            }
+            else {
+                Console.WriteLine($"{bulbasaur.Name.ToUpper()} não pode evoluir ainda (nível insuficiente).");
+            }
+        }Console.WriteLine("\nDemonstração futura de evolução (a ser implementada nos próximos dias):");
+
+        Pokemon charmander = detailedPokemons.FirstOrDefault(p => p?.Name == "charmander");
+        if (charmander != null) {
+            Pokemon evolved = await evolutionSystem.EvolvePokemon(charmander, level: 16); 
+            if (evolved != null && evolved.Name != charmander.Name) {
+                Console.WriteLine($"Evolução: {charmander.Name.ToUpper()} evoluiu para {evolved.Name.ToUpper()}!");
+            }
+            else {
+                Console.WriteLine($"{bulbasaur.Name.ToUpper()} não pode evoluir ainda (nível insuficiente).");
+            }
+        }Console.WriteLine("\nDemonstração futura de evolução (a ser implementada nos próximos dias):");
+        Pokemon squirtle = detailedPokemons.FirstOrDefault(p => p?.Name == "squirtle");
+        if (squirtle != null) {
+            Pokemon evolved = await evolutionSystem.EvolvePokemon(squirtle, level: 16); 
+            if (evolved != null && evolved.Name != squirtle.Name) {
+                Console.WriteLine($"Evolução: {squirtle.Name.ToUpper()} evoluiu para {evolved.Name.ToUpper()}!");
+            }
+            else {
+                Console.WriteLine($"{bulbasaur.Name.ToUpper()} não pode evoluir ainda (nível insuficiente).");
+            }
         }
 
         Console.WriteLine("\nPressione qualquer tecla para sair...");
