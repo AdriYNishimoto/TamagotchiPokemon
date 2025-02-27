@@ -1,21 +1,33 @@
 ﻿using RestSharp;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using TamagotchiPokemon;
 
 class Program {
     static void Main(string[] args) {
-
+        // URL da API com limite de 9 Pokémon
         string url = "https://pokeapi.co/api/v2/pokemon?limit=9";
         var client = new RestClient(url);
         var request = new RestRequest("", Method.Get);
         var response = client.Execute(request);
 
         if (response.IsSuccessful) {
-            JObject jsonResponse = JObject.Parse(response.Content);
-            var pokemons = jsonResponse["results"];
+            var options = new JsonSerializerOptions {
+                PropertyNameCaseInsensitive = true
+            };
+            PokemonResponse pokemonList = JsonSerializer.Deserialize<PokemonResponse>(response.Content, options);
 
-            Console.WriteLine("Lista de 9 Pokémon iniciais:");
-            foreach (var pokemon in pokemons) {
-                Console.WriteLine($"- {pokemon["name"]}");
+            Console.WriteLine("Lista de Mascotes Virtuais (Pokémon) Disponíveis para Adoção:");
+            Console.WriteLine("------------------------------------------------");
+
+            foreach (var pokemon in pokemonList.Results) {
+                Console.WriteLine($"\nNome: {pokemon.Name.ToUpper()}");
+                Console.WriteLine($"Altura: {(pokemon.Height / 10.0)} m"); 
+                Console.WriteLine($"Peso: {(pokemon.Weight / 10.0)} kg");  
+                Console.WriteLine("Habilidades:");
+                foreach (var ability in pokemon.Abilities) {
+                    Console.WriteLine($"- {ability.Name} (Escondida: {ability.IsHidden}, Slot: {ability.Slot})");
+                }
+                Console.WriteLine("------------------------------------------------");
             }
         }
         else {
@@ -27,37 +39,43 @@ class Program {
     }
 
     static void BuscarDetalhesPokemon(string nome) {
-
         string url = $"https://pokeapi.co/api/v2/pokemon/{nome.ToLower()}";
+
         var client = new RestClient(url);
         var request = new RestRequest("", Method.Get);
         var response = client.Execute(request);
 
-        
         if (response.IsSuccessful) {
-            
-            JObject pokemonData = JObject.Parse(response.Content);
-            string nomePokemon = pokemonData["name"].ToString();
-            double altura = pokemonData["height"] != null ? pokemonData["height"].Value<double>() : 0; 
-            double peso = pokemonData["weight"] != null ? pokemonData["weight"].Value<double>() : 0; 
 
-            
-            var types = pokemonData["types"];
-            string tipagem = "";
-            if (types != null && types.HasValues) {
-                tipagem = string.Join(", ", types.Select(t => t["type"]["name"].ToString()));
-            }
-            else {
-                tipagem = "Tipo não encontrado";
-            }
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            Pokemon pokemon = JsonSerializer.Deserialize<Pokemon>(response.Content, options);
 
-            Console.WriteLine($"\nDetalhes do Pokémon {nomePokemon.ToUpper()}:");
-            Console.WriteLine($"Tipo: {tipagem}");
-            Console.WriteLine($"Altura: {altura / 10} m"); 
-            Console.WriteLine($"Peso: {peso / 10} kg");   
+            Console.WriteLine($"\nDetalhes do Pokémon {pokemon.Name.ToUpper()}:");
+            Console.WriteLine($"Tipo: {GetPokemonTypes(response.Content)}"); 
+            Console.WriteLine($"Altura: {(pokemon.Height / 10.0)} m");
+            Console.WriteLine($"Peso: {(pokemon.Weight / 10.0)} kg");
+            Console.WriteLine("Habilidades:");
+            foreach (var ability in pokemon.Abilities) {
+                Console.WriteLine($"- {ability.Name} (Escondida: {ability.IsHidden}, Slot: {ability.Slot})");
+            }
         }
         else {
             Console.WriteLine("Não foi possível obter detalhes do Pokémon.");
         }
+    }
+
+    static string GetPokemonTypes(string jsonContent) {
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        var pokemonData = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(jsonContent, options);
+        if (pokemonData.TryGetValue("types", out JsonElement typesElement) && typesElement.ValueKind == JsonValueKind.Array) {
+            var types = new List<string>();
+            foreach (var type in typesElement.EnumerateArray()) {
+                if (type.TryGetProperty("type", out JsonElement typeObj) && typeObj.TryGetProperty("name", out JsonElement nameElement)) {
+                    types.Add(nameElement.GetString());
+                }
+            }
+            return string.Join(", ", types);
+        }
+        return "Tipo não encontrado";
     }
 }
