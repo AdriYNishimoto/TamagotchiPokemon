@@ -16,11 +16,7 @@ namespace TamagotchiPokemon {
 
         public async Task Start() {
             // Boas-vindas e leitura do nome do usuário
-            Console.WriteLine("################################################");
-            Console.WriteLine("#                                              #");
-            Console.WriteLine("#              T A M A G O T C H I             #");
-            Console.WriteLine("#                                              #");
-            Console.WriteLine("################################################");
+            Console.WriteLine("  _______       __  __          _____  ____ _______ _____ _    _ _____ \r\n |__   __|/\\   |  \\/  |   /\\   / ____|/ __ \\__   __/ ____| |  | |_   _|\r\n    | |  /  \\  | \\  / |  /  \\ | |  __| |  | | | | | |    | |__| | | |  \r\n    | | / /\\ \\ | |\\/| | / /\\ \\| | |_ | |  | | | | | |    |  __  | | |  \r\n    | |/ ____ \\| |  | |/ ____ \\ |__| | |__| | | | | |____| |  | |_| |_ \r\n    |_/_/    \\_\\_|  |_/_/    \\_\\_____|\\____/  |_|  \\_____|_|  |_|_____|\r\n                                                                       \r\n                                                                       ");
             Console.Write("\nQual é seu nome? ");
             userName = Console.ReadLine();
             Console.WriteLine($"\nOlá, {userName}! Bem-vindo ao Tamagotchi Pokémon!");
@@ -111,12 +107,23 @@ namespace TamagotchiPokemon {
                             adoptedPokemons.Add(pokemon);
                             Console.WriteLine($"\nMascote adotado com sucesso, o ovo está chocando: {pokemon.Name.ToUpper()}!");
                             Console.WriteLine(@"
-  _____
- /     \
-| o   o |
-|   ^   |
-|  ___  |
-|_______|");
+          ████████          
+        ██        ██        
+      ██▒▒▒▒        ██      
+    ██▒▒▒▒▒▒      ▒▒▒▒██    
+    ██▒▒▒▒▒▒      ▒▒▒▒██    
+  ██  ▒▒▒▒        ▒▒▒▒▒▒██  
+  ██                ▒▒▒▒██  
+██▒▒      ▒▒▒▒▒▒          ██
+██      ▒▒▒▒▒▒▒▒▒▒        ██
+██      ▒▒▒▒▒▒▒▒▒▒    ▒▒▒▒██
+██▒▒▒▒  ▒▒▒▒▒▒▒▒▒▒  ▒▒▒▒▒▒██
+  ██▒▒▒▒  ▒▒▒▒▒▒    ▒▒▒▒██  
+  ██▒▒▒▒            ▒▒▒▒██  
+    ██▒▒              ██    
+      ████        ████      
+          ████████           
+");
                             return;
                         case "3":
                             return;
@@ -179,3 +186,8 @@ namespace TamagotchiPokemon {
         }
     }
 }
+
+
+
+
+
