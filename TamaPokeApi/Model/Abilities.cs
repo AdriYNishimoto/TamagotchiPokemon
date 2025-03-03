@@ -1,17 +1,19 @@
-﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace TamagotchiPokemon.Model {
     // Classe para representar a habilidade interna (dentro de "ability")
     public class AbilityDetail {
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
+
+        [JsonPropertyName("url")]
+        public string? Url { get; set; }
     }
 
     // Classe para representar as habilidades de um Pokémon
     public class Ability {
         [JsonPropertyName("ability")]
-        public AbilityDetail AbilityDetail { get; set; }
+        public AbilityDetail? AbilityDetail { get; set; }
 
         [JsonPropertyName("is_hidden")]
         public bool IsHidden { get; set; }
@@ -20,6 +22,6 @@ namespace TamagotchiPokemon.Model {
         public int Slot { get; set; }
 
         // Propriedade para acessar o nome da habilidade de forma direta
-        public string Name => AbilityDetail?.Name ?? "Nome não encontrado";
+        public string? Name => AbilityDetail?.Name ?? "Nome não encontrado";
     }
 }
