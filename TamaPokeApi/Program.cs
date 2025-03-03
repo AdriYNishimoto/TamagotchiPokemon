@@ -1,8 +1,8 @@
-﻿using TamagotchiPokemon;
+﻿using TamagotchiPokemon.Controller;
 
 class Program {
     static async Task Main(string[] args) {
-        var menu = new Menu();
-        await menu.Start();
+        var controller = new TamagotchiController();
+        await controller.Jogar();
     }
 }
